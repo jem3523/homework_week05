@@ -1,30 +1,74 @@
-//each div will need to look at real time and change color based on past/present/future
-//will need to use https://momentjs.com/
-//save everything in local storage in an array + save eventListener
-//head should include the current day
-
 $(document).ready(function() 
-    {console.log("ready")});
-
-  timeSlots = [
-    {label: "09 AM", entry:"start work"},
-    {label: "10 AM", entry:"get coffee"},
-    {label: "11 AM", entry:"take nap"},
-    {label: "12 PM", entry:"lunch"},
-    {label: "01 PM", entry:""},
-    {label: "02 PM", entry:""},
-    {label: "03 PM", entry:"open"},
-    {label: "04 PM", entry:"open"},
-    {label: "05 PM", entry:"go home"}];
-
-
-function pageRender()
 {
-  $.each(timeSlots, function(index,value) 
+  timeSlots = [
+    {time: 9,  label: "09 AM", entry:""},
+    {time: 10, label: "10 AM", entry:""},
+    {time: 11, label: "11 AM", entry:""},
+    {time: 12, label: "12 PM", entry:""},
+    {time: 13,  label: "01 PM", entry:""},
+    {time: 14,  label: "02 PM", entry:""},
+    {time: 15,  label: "03 PM", entry:""},
+    {time: 16,  label: "04 PM", entry:""},
+    {time: 17,  label: "05 PM", entry:""},
+    {time: 18,  label: "06 PM", entry:""}];
+
+
+  function pageRender()
+  { 
+    if (localStorage.getItem("timeSlots") !== null)
+    {timeSlots = JSON.parse(localStorage.getItem("timeSlots"))};
+
+    //JASON ... ask why this doesn't work:  $.each(timeSlots,buildElements(index,value));
+    $.each(timeSlots,function(index,value)
+    {
+      $("#main").append("<div id='lineDiv_" + index + "' class='input-group' ></div>");
+      $("#lineDiv_" + index).append("<div id='label_" + index + "' class='input-group-prepend hour' ><span class='input-group-text'>" + value.label + "</span></div>");
+      $("#lineDiv_" + index).append("<input id='input_" + index + "' class='form-control' type='text' value='" + value.entry + "'></input>");
+      $("#lineDiv_" + index).append("<div id='buttonDiv_" + index + "' class='input-group-append'><button class='btn btn-outline-secondary saveBtn' type='button' value ='" + index + "'>Save</div>");
+    })
+  };
+
+
+  function updateStatus()
   {
-    $("#main").append("<div id='" + index + "_lineDiv' class='input-group' ></div>");
-    $("#" + index + "_lineDiv").append("<div id='" + index + "_labelDiv' class='input-group-prepend' ><span class='input-group-text'>" + value.label + "</span></div>");
-    $("#" + index + "_lineDiv").append("<div id='" + index + "_inputDiv' class='form-control' type='text' >" + value.entry + "</div>");
-    $("#" + index + "_lineDiv").append("<div id='" + index + "_buttonDiv' class='input-group-append' type='button'><button class='btn btn-outline-secondary' type='button' id='" + index + "_button'>Save</div>");
-  });
-}
+    $("#currentDay").text(moment().format('MMMM Do YYYY'));
+
+    $.each(timeSlots,function(index,value)
+    {
+      if(value.time == moment().format('H'))
+      {
+        $("#input_" + index).addClass("present");
+        $("#input_" + index).removeClass("past", "future");
+      };
+      if(value.time < moment().format('H'))
+      {
+        $("#input_" + index).addClass("past");
+        $("#input_" + index).removeClass("present", "future");
+      }
+      if(value.time > moment().format('H'))
+      {
+        $("#input_" + index).addClass("future");
+        $("#input_" + index).removeClass("past", "present");
+      }
+    })
+  };
+
+
+  function saveToLocal()
+  {
+    console.log(event);
+    event.preventDefault();
+    var tempIndex = event.target.value;
+    var tempValue = document.getElementById("input_" + tempIndex).value
+    //JASON ... ask why the line below does not work
+    //var tempValue = $("#input_" + tempIndex).value
+    timeSlots[tempIndex].entry = tempValue
+    localStorage.setItem("timeSlots", JSON.stringify(timeSlots));
+  };
+
+  pageRender();
+  updateStatus();
+  internvalID = setInterval(updateStatus,60000);
+  $(".saveBtn").on("click" , saveToLocal);
+  console.log("ready")
+})
