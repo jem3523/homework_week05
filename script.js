@@ -18,7 +18,7 @@ $(document).ready(function()
     if (localStorage.getItem("timeSlots") !== null)
     {timeSlots = JSON.parse(localStorage.getItem("timeSlots"))};
 
-    //JASON ... ask why this doesn't work:  $.each(timeSlots,buildElements(index,value));
+
     $.each(timeSlots,function(index,value)
     {
       $("#main").append("<div id='lineDiv_" + index + "' class='input-group' ></div>");
