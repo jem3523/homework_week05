@@ -12,13 +12,14 @@ $(document).ready(function()
     {time: 17,  label: "05 PM", entry:""},
     {time: 18,  label: "06 PM", entry:""}];
 
-
+  //build the dynamic page
   function pageRender()
   { 
+    //first check to see the local storage has been built
     if (localStorage.getItem("timeSlots") !== null)
     {timeSlots = JSON.parse(localStorage.getItem("timeSlots"))};
 
-
+    //then build the basic structure of the page (cycle through for each line)
     $.each(timeSlots,function(index,value)
     {
       $("#main").append("<div id='lineDiv_" + index + "' class='input-group' ></div>");
@@ -28,11 +29,12 @@ $(document).ready(function()
     })
   };
 
-
+  //this function updates both the date in the header and checks every minute to update the color coding based on current time
   function updateStatus()
   {
     $("#currentDay").text(moment().format('MMMM Do YYYY'));
 
+    //note that the time check is ONLY the hour in military time
     $.each(timeSlots,function(index,value)
     {
       if(value.time == moment().format('H'))
@@ -53,7 +55,7 @@ $(document).ready(function()
     })
   };
 
-
+  //save to local storage 
   function saveToLocal()
   {
     console.log(event);
